@@ -73,39 +73,32 @@ These above scenarios are for different operations(create cmk operation, encrypt
 
 ## Data Encryption Keys (DEK)
 
-kms generate dek using cmk and GenerateDataKey operation.This dek is used to encrypt data larger than 4 kb
+As you have noted the DEK is used when you need to encrypt data larger than 4kB (which is the maximum as CMK can do)
 
-The dek that is generated, is linked to specific cmk.So kms can tell which dek is attached with which cmk
+A DEK is generated and can be encrypted / decrypted using a CMK
 
-kms does not stores the dek in any way <- (important)
+Unlike CMKs, AWS does not manage DEKs for you, they are simply returned to you.(<- important)
 
-kma provides this dek to you directly and then discards it.
+When you need to do this, you are expected to do something like:
 
-the reason kms discards it, because kms do not actually perform the encryption or decryption of data using dek
+-- Storage --
 
-kms does not use dek for anything but only geneates them, thats it.
+- Generate a DEK
+- Use the DEK to encrypt the data
+- Store an encrypted version of the DEK along with the encrypted data
+-Delete (discard) the unencrypted version of the DEK
 
-## How dek works
+-- Retrieval --
 
-when dek is generated, kms provide two versions of that dek 
-
-1: plainText versions: something that can be used immediately
-
-2: cipherText versions: encrypted version of the same dek
-
-this dek is encrypted by that same customer master key, which generated it and also decrypted by the same cmk
-
-##Architecture of dek
-
-You would generate a dek immediately before you wanted to encrypt something
-
-you take plainText version that dek and encrypt your plainText.That geneates cipherText for your data and then you discards the plainText version of dek(This whole process is done by you not by KMS as the size is larger than 4 kb)
-
-The encrypted DEK(cipherText version) is stored next to the ciphertext generated earlier(on above line). like side by side
-
-you could use same dek to encrypt millions of file or you could generate different dek to encrypt these millions files.
-
-Decrypting that file is simple, you pass encrypted dek to kms and ask to decrypt it using the same cmk that was used to generate it.
-
+- Access data + encrypted DEK
+- Use the CMK to decrypt the DEK
+- Use the (now decrypted) DEK to decrypt the data
+- This pattern means that even if someone has access to the encrypted data and the encrypted DEK, they still cannot access the data without the CMK.
+- The key here is that AWS know that you need to do 2 things.
+- 1. Use the DEK to encrypt data - this requires a PLAINTEXT version
+- 2. Store an encrypted version of the DEK with the data - this requires a CIPHERTEXT version.
+- Thus, the reason they are both returned is to make your life easier.
+- If only the CIPHERTEXT version was returned, it would need to be decrypted before it could be used.
+- If only the PLAINTEXT version was returned, it would need to be encrypted before it could be persisted anywhere.
 
 
