@@ -97,8 +97,11 @@ When you need to do this, you are expected to do something like:
 - The key here is that AWS know that you need to do 2 things.
 - 1. Use the DEK to encrypt data - this requires a PLAINTEXT version
 - 2. Store an encrypted version of the DEK with the data - this requires a CIPHERTEXT version.
-- Thus, the reason they are both returned is to make your life easier.
-- If only the CIPHERTEXT version was returned, it would need to be decrypted before it could be used.
-- If only the PLAINTEXT version was returned, it would need to be encrypted before it could be persisted anywhere.
+
+Thus, the reason they are both returned is to make your life easier.
+
+If only the CIPHERTEXT version was returned, it would need to be decrypted before it could be used.
+
+If only the PLAINTEXT version was returned, it would need to be encrypted before it could be persisted anywhere.
 
 
