@@ -79,6 +79,11 @@ A DEK is generated and can be encrypted / decrypted using a CMK
 
 Unlike CMKs, AWS does not manage DEKs for you, they are simply returned to you.(<- important)
 
+DEK gives two versions:
+
+1: PlainText version: used to encrypt data
+2: CypherText version: encrypted dek is placed side by side with encrypted data
+
 When you need to do this, you are expected to do something like:
 
 -- Storage --
